@@ -15,15 +15,15 @@ NC='\033[0m'  # reset/no color
 # # echo -e "${YELLOW}This is yellow (bold)${NC}"
 
 # # TCP Scan Ports
-# echo -e "${YELLOW}Task 1.1: Develop a Port Scanner\n(TCP Scanner Working...)${NC}"
+echo -e "${YELLOW}Task 1.1: Develop a Port Scanner\n(TCP Scanner Working...)${NC}"
 cd port_scanner
-# python3 scanner.py \
-#     --target 172.20.0.0/27 \
-#     --ports 1-10000 \
-#     --threads 3000 \
-#     --scan-type tcp \
-#     --output json \
-#     --output-file tcp_scan_ports.json
+python3 scanner.py \
+    --target 172.20.0.0/27 \
+    --ports 1-10000 \
+    --threads 3000 \
+    --scan-type tcp \
+    --output json \
+    --output-file tcp_scan_ports.json
 
 # UDP Scan Ports Code also supported but not required for this assigment
 # python3 scanner.py \
@@ -102,5 +102,56 @@ curl -s -v \
 echo -e "${RED}Flag 3 Captured! Press Enter to continue...${NC}"
 read
 
-echo -e "${YELLOW}Part 3 Fix 1: Port Knocking (Protecting SSH server on 172.20.0.20:2222)${NC}"
+set -euo pipefail
+
+TARGET_IP=${1:-172.20.0.40}
+SEQUENCE=${2:-"1234,5678,9012"}
+PROTECTED_PORT=${3:-2222}
+
+echo -e "${YELLOW}Part 3 Fix 1: Port Knocking (Protecting SSH server on 172.20.0.40:2222)${NC}"
 read
+
+echo "[1/6] Attempting protected port before knocking, 5s timeout"
+echo -e "${RED}"
+nc -z -v -w 5 "$TARGET_IP" "$PROTECTED_PORT" || true
+echo -e "${NC}"
+
+
+echo "[2/6] Sending knock sequence: $SEQUENCE. Press enter to continue..."
+read
+for PORT in ${SEQUENCE//,/ }; do
+  echo "Knocking $TARGET_IP:$PORT"
+  nc -z "$TARGET_IP" "$PORT" || true
+  sleep 0.3
+done
+
+echo ""
+echo "[3/6] Attempting protected port after knocking"
+echo -e "${GREEN}"
+nc -z -v -w 5 "$TARGET_IP" "$PROTECTED_PORT" || true
+echo -e "${NC}"
+
+echo "Sleeping for 15s to reset protection..."
+sleep 15
+
+echo ""
+echo "[5/6] Attempting protected port again after 15s protection timeout. Press enter to try again..."
+read
+echo -e "${RED}"
+nc -z -v -w 5 "$TARGET_IP" "$PROTECTED_PORT" || true
+echo -e "${NC}"
+
+echo "[5/6] Attempting protected port again but with wrong knocking sequence. Press enter to continue..."
+read
+echo "Sending knock sequence: 1234,9012,5678"
+for PORT in 1234 9012 5678; do
+  echo "Knocking $TARGET_IP:$PORT"
+  nc -z "$TARGET_IP" "$PORT" || true
+  sleep 0.3
+done
+
+echo ""
+echo "[6/6] Attempting protected port after knocking"
+echo -e "${RED}"
+nc -z -v -w 5 "$TARGET_IP" "$PROTECTED_PORT" || true
+echo -e "${NC}"

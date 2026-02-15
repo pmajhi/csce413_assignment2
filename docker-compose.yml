@@ -101,6 +101,7 @@ services:
       - ./honeypot/logs:/app/logs
 
   # TODO: Feel free to update port_knocking if needed
+
   port_knocking:
     container_name: 2_network_port_knocking
     build:
@@ -109,8 +110,9 @@ services:
     dns:
       - 8.8.8.8
       - 1.1.1.1
-    cap_add:
-      - NET_ADMIN
+    ports:
+      - "2223:2222"            # host 2223 → container ssh 2222
+    privileged: true
     networks:
       vulnerable_network:
         ipv4_address: 172.20.0.40
