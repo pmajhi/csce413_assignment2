@@ -155,3 +155,16 @@ echo "[6/6] Attempting protected port after knocking"
 echo -e "${RED}"
 nc -z -v -w 5 "$TARGET_IP" "$PROTECTED_PORT" || true
 echo -e "${NC}"
+
+echo -e "${YELLOW}Part 3 Fix 2: Honeypot from scratch (Fake SSH server on 172.20.0.30:2222)${NC}"
+read
+
+echo "Try this on a new Terminal yourself."
+echo -e "${GREEN}ssh admin@localhost -p 2222${NC}"
+read
+
+# echo -e "Saving the logs..."
+# cd "../"
+# mkdir -p honeypot/logs
+# docker logs 2_network_honeypot | tail -n 200 > honeypot/logs/cowrie.log
+

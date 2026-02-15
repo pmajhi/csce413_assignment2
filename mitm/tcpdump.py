@@ -24,7 +24,6 @@ packets = sniff(
     prn=packet_handler
 )
 
-# wrpcap("mitm.pcap", packets)
 print(f"Captured {len(packets)} packets into mitm.log")
 
 from scapy.all import IP, TCP, Raw

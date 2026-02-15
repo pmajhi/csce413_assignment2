@@ -83,7 +83,24 @@ services:
       vulnerable_network:
         ipv4_address: 172.20.0.22
 
-  # TODO: Feel free to update honeypot if needed
+  # # TODO: Feel free to update honeypot if needed
+  # honeypot:
+  #   container_name: 2_network_honeypot
+  #   image: cowrie/cowrie:latest
+  #   dns:
+  #     - 8.8.8.8
+  #     - 1.1.1.1
+  #   environment:
+  #     COWRIE_USER: cowrie
+  #     COWRIE_GROUP: cowrie
+  #   ports:
+  #     - "2222:2222"
+  #   volumes:
+  #     - ./honeypot/logs:/cowrie/log
+  #   networks:
+  #     vulnerable_network:
+  #       ipv4_address: 172.20.0.30
+
   honeypot:
     container_name: 2_network_honeypot
     build:
@@ -99,6 +116,7 @@ services:
         ipv4_address: 172.20.0.30
     volumes:
       - ./honeypot/logs:/app/logs
+
 
   # TODO: Feel free to update port_knocking if needed
 
